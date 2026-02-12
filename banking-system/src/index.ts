@@ -29,17 +29,16 @@ function showMenu() {
   console.log("5. Check Balance");
   console.log("6. Exit");
 
-  ask("Choose an option: ", (choice) => {
+  bank.addCustomer(customer);
     switch (choice) {
-      case "1":
-        ask("Enter amount to deposit: ", (amt) => {
+  const account1 = bank.createAccount("C001", "A1001");
           try {
             const amount = Number(amt);
             bank.deposit(account1.accountNumber, amount);
             console.log(`Deposited ${amount}. New balance: ${bank.getBalance(account1.accountNumber)}`);
-          } catch (e: any) {
-            console.log("Error:", e.message);
-          }
+              const amount = Number(amt);
+              bank.depositToAccount(account1.accountNumber, amount);
+              console.log(`Deposited ${amount}. New balance: ${bank.getAccountBalance(account1.accountNumber)}`);
           showMenu();
         });
         break;
@@ -50,9 +49,9 @@ function showMenu() {
             const amount = Number(amt);
             bank.withdraw(account1.accountNumber, amount);
             console.log(`Withdrawn ${amount}. New balance: ${bank.getBalance(account1.accountNumber)}`);
-          } catch (e: any) {
-            console.log("Error:", e.message);
-          }
+              const amount = Number(amt);
+              bank.withdrawFromAccount(account1.accountNumber, amount);
+              console.log(`Withdrawn ${amount}. New balance: ${bank.getAccountBalance(account1.accountNumber)}`);
           showMenu();
         });
         break;
@@ -65,9 +64,9 @@ function showMenu() {
               const amount = Number(amt);
               bank.transfer(account1.accountNumber, targetAccount.accountNumber, amount);
               console.log(`Transferred ${amount}. Source balance: ${bank.getBalance(account1.accountNumber)}, Target balance: ${bank.getBalance(targetAccount.accountNumber)}`);
-            } catch (e: any) {
-              console.log("Error:", e.message);
-            }
+                const amount = Number(amt);
+                bank.transferBetweenAccounts(account1.accountNumber, targetAccount.accountNumber, amount);
+                console.log(`Transferred ${amount}. Source balance: ${bank.getAccountBalance(account1.accountNumber)}, Target balance: ${bank.getAccountBalance(targetAccount.accountNumber)}`);
             showMenu();
           });
         });

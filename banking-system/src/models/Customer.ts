@@ -6,6 +6,6 @@ export class Customer {
     public readonly id: string,
     public name: string,
     public accounts: Account[] = [],
-    public loans: Loan[] = []
+    public loans: Loan[] = [],
   ) {}
 }

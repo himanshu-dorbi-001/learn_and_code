@@ -19,77 +19,100 @@ export class BankingSystem {
   }
 
   openAccount(customerId: string, accountNumber: string): Account {
-    const customer = this.getCustomer(customerId);
-    const account = new Account(accountNumber);
-    customer.accounts.push(account);
-    return account;
-  }
+    import { Customer } from "../models/Customer.js";
+    import { Account } from "../models/Account.js";
+    import { Loan } from "../models/Loan.js";
 
-  applyLoan(
-    customerId: string,
-    loanId: string,
-    principal: number,
-    rate: number,
-    term: number,
-  ): Loan {
-    const customer = this.getCustomer(customerId);
-    const loan = new Loan(loanId, principal, rate, term);
-    customer.loans.push(loan);
-    return loan;
-  }
+    export class BankingSystem {
+      private customers: Map<string, Customer> = new Map();
 
-  private findAccount(accountNumber: string): Account {
-    for (const customer of this.customers.values()) {
-      const acc = customer.accounts.find((a) => a.accountNumber === accountNumber);
-      if (acc) return acc;
+      addCustomer(customer: Customer): void {
+        if (this.customers.has(customer.id)) {
+          throw new Error("customer already exists");
+        }
+        this.customers.set(customer.id, customer);
+      }
+
+      getCustomer(customerId: string): Customer {
+        const customer = this.customers.get(customerId);
+        if (!customer) throw new Error("customer not found");
+        return customer;
+      }
+
+      createAccount(customerId: string, accountNumber: string): Account {
+        const customer = this.getCustomer(customerId);
+        const exists = Array.from(this.customers.values()).some((c) =>
+          c.accounts.some((a) => a.accountNumber === accountNumber),
+        );
+        if (exists) throw new Error("account number already exists");
+        const account = new Account(accountNumber);
+        customer.accounts.push(account);
+        return account;
+      }
+
+      applyLoan(customerId: string, loanId: string, principal: number, rate: number, term: number): Loan {
+        const customer = this.getCustomer(customerId);
+        this.validatePositiveNumber(principal, "principal");
+        this.validateNonNegativeNumber(rate, "interest rate");
+        this.validatePositiveNumber(term, "termInYears");
+        const loan = new Loan(loanId, principal, rate, term);
+        customer.loans.push(loan);
+        return loan;
+      }
+
+      depositToAccount(accountNumber: string, amount: number): void {
+        const value = this.validatePositiveNumber(amount, "amount");
+        const account = this.findAccount(accountNumber);
+        account.balance += value;
+      }
+
+      withdrawFromAccount(accountNumber: string, amount: number): void {
+        const value = this.validatePositiveNumber(amount, "amount");
+        const account = this.findAccount(accountNumber);
+        if (value > account.balance) throw new Error("insufficient funds");
+        account.balance -= value;
+      }
+
+      transferBetweenAccounts(fromAccountNumber: string, toAccountNumber: string, amount: number): void {
+        const value = this.validatePositiveNumber(amount, "amount");
+        if (fromAccountNumber === toAccountNumber) throw new Error("cannot transfer to same account");
+        const from = this.findAccount(fromAccountNumber);
+        const to = this.findAccount(toAccountNumber);
+        if (value > from.balance) throw new Error("insufficient funds");
+        from.balance -= value;
+        to.balance += value;
+      }
+
+      getAccountBalance(accountNumber: string): number {
+        const account = this.findAccount(accountNumber);
+        return account.balance;
+      }
+
+      calculateLoanRepayment(loan: Loan): number {
+        this.validatePositiveNumber(loan.principal, "principal");
+        this.validateNonNegativeNumber(loan.interestRate, "interest rate");
+        this.validatePositiveNumber(loan.termInYears, "termInYears");
+        const interest = loan.principal * (loan.interestRate / 100) * loan.termInYears;
+        return loan.principal + interest;
+      }
+
+      private findAccount(accountNumber: string): Account {
+        for (const customer of this.customers.values()) {
+          const account = customer.accounts.find((a) => a.accountNumber === accountNumber);
+          if (account) return account;
+        }
+        throw new Error("account not found");
+      }
+
+      private validatePositiveNumber(value: any, name: string): number {
+        const num = Number(value);
+        if (!Number.isFinite(num) || num <= 0) throw new Error(`${name} must be a positive number`);
+        return num;
+      }
+
+      private validateNonNegativeNumber(value: any, name: string): number {
+        const num = Number(value);
+        if (!Number.isFinite(num) || num < 0) throw new Error(`${name} must be a non-negative number`);
+        return num;
+      }
     }
-    throw new Error("Account not found");
-  }
-
-  private validateAmount(amount: any) {
-    if (typeof amount !== "number" || !isFinite(amount)) throw new Error("Amount must be a number");
-    if (amount <= 0) throw new Error("Amount must be greater than zero");
-  }
-
-  deposit(accountNumber: string, amount: number): void {
-    this.validateAmount(amount);
-    const account = this.findAccount(accountNumber);
-    account.balance += amount;
-  }
-
-  withdraw(accountNumber: string, amount: number): void {
-    this.validateAmount(amount);
-    const account = this.findAccount(accountNumber);
-    if (amount > account.balance) throw new Error("Insufficient funds");
-    account.balance -= amount;
-  }
-
-  transfer(fromAccountNumber: string, toAccountNumber: string, amount: number): void {
-    this.validateAmount(amount);
-    if (fromAccountNumber === toAccountNumber) throw new Error("Cannot transfer to same account");
-    const from = this.findAccount(fromAccountNumber);
-    const to = this.findAccount(toAccountNumber);
-    if (amount > from.balance) throw new Error("Insufficient funds");
-    from.balance -= amount;
-    to.balance += amount;
-  }
-
-  calculateLoanRepayment(loan: Loan): number {
-    if (typeof loan.principal !== "number" || !isFinite(loan.principal) || loan.principal <= 0) {
-      throw new Error("Invalid principal");
-    }
-    if (typeof loan.interestRate !== "number" || !isFinite(loan.interestRate) || loan.interestRate < 0) {
-      throw new Error("Invalid interest rate");
-    }
-    if (typeof loan.termInYears !== "number" || !isFinite(loan.termInYears) || loan.termInYears <= 0) {
-      throw new Error("Invalid term");
-    }
-    const interest = loan.principal * (loan.interestRate / 100) * loan.termInYears;
-    return loan.principal + interest;
-  }
-
-  getBalance(accountNumber: string): number {
-    const account = this.findAccount(accountNumber);
-    return account.balance;
-  }
-}
