@@ -46,20 +46,46 @@ export class BankingSystem {
     throw new Error("Account not found");
   }
 
+  private validateAmount(amount: any) {
+    if (typeof amount !== "number" || !isFinite(amount)) throw new Error("Amount must be a number");
+    if (amount <= 0) throw new Error("Amount must be greater than zero");
+  }
+
   deposit(accountNumber: string, amount: number): void {
+    this.validateAmount(amount);
     const account = this.findAccount(accountNumber);
-    account.deposit(amount);
+    account.balance += amount;
   }
 
   withdraw(accountNumber: string, amount: number): void {
+    this.validateAmount(amount);
     const account = this.findAccount(accountNumber);
-    account.withdraw(amount);
+    if (amount > account.balance) throw new Error("Insufficient funds");
+    account.balance -= amount;
   }
 
   transfer(fromAccountNumber: string, toAccountNumber: string, amount: number): void {
+    this.validateAmount(amount);
+    if (fromAccountNumber === toAccountNumber) throw new Error("Cannot transfer to same account");
     const from = this.findAccount(fromAccountNumber);
     const to = this.findAccount(toAccountNumber);
-    from.transfer(amount, to);
+    if (amount > from.balance) throw new Error("Insufficient funds");
+    from.balance -= amount;
+    to.balance += amount;
+  }
+
+  calculateLoanRepayment(loan: Loan): number {
+    if (typeof loan.principal !== "number" || !isFinite(loan.principal) || loan.principal <= 0) {
+      throw new Error("Invalid principal");
+    }
+    if (typeof loan.interestRate !== "number" || !isFinite(loan.interestRate) || loan.interestRate < 0) {
+      throw new Error("Invalid interest rate");
+    }
+    if (typeof loan.termInYears !== "number" || !isFinite(loan.termInYears) || loan.termInYears <= 0) {
+      throw new Error("Invalid term");
+    }
+    const interest = loan.principal * (loan.interestRate / 100) * loan.termInYears;
+    return loan.principal + interest;
   }
 
   getBalance(accountNumber: string): number {

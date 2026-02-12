@@ -33,8 +33,13 @@ function showMenu() {
     switch (choice) {
       case "1":
         ask("Enter amount to deposit: ", (amt) => {
-          account1.deposit(Number(amt));
-          console.log(`Deposited ${amt}. New balance: ${account1.balance}`);
+          try {
+            const amount = Number(amt);
+            bank.deposit(account1.accountNumber, amount);
+            console.log(`Deposited ${amount}. New balance: ${bank.getBalance(account1.accountNumber)}`);
+          } catch (e: any) {
+            console.log("Error:", e.message);
+          }
           showMenu();
         });
         break;
@@ -42,8 +47,9 @@ function showMenu() {
       case "2":
         ask("Enter amount to withdraw: ", (amt) => {
           try {
-            account1.withdraw(Number(amt));
-            console.log(`Withdrawn ${amt}. New balance: ${account1.balance}`);
+            const amount = Number(amt);
+            bank.withdraw(account1.accountNumber, amount);
+            console.log(`Withdrawn ${amount}. New balance: ${bank.getBalance(account1.accountNumber)}`);
           } catch (e: any) {
             console.log("Error:", e.message);
           }
@@ -56,8 +62,9 @@ function showMenu() {
           const targetAccount = bank.openAccount("C001", accNum);
           ask("Enter amount to transfer: ", (amt) => {
             try {
-              account1.transfer(Number(amt), targetAccount);
-              console.log(`Transferred ${amt}. Source balance: ${account1.balance}, Target balance: ${targetAccount.balance}`);
+              const amount = Number(amt);
+              bank.transfer(account1.accountNumber, targetAccount.accountNumber, amount);
+              console.log(`Transferred ${amount}. Source balance: ${bank.getBalance(account1.accountNumber)}, Target balance: ${bank.getBalance(targetAccount.accountNumber)}`);
             } catch (e: any) {
               console.log("Error:", e.message);
             }
@@ -72,7 +79,7 @@ function showMenu() {
             ask("Enter interest rate: ", (rate) => {
               ask("Enter term (years): ", (term) => {
                 const loan = bank.applyLoan("C001", loanId, Number(principal), Number(rate), Number(term));
-                console.log(`Loan applied. Total repayment: ${loan.calculateTotalRepayment()}`);
+                console.log(`Loan applied. Total repayment: ${bank.calculateLoanRepayment(loan)}`);
                 showMenu();
               });
             });
