@@ -1,0 +1,17 @@
+
+> finance-tracker-backend@1.0.0 dev
+> ts-node index.ts
+
+Starting Personal Finance Tracker in console mode...
+
+=== Personal Finance Tracker (Console Mode) ===
+1. Create User
+2. List Users
+3. Add Transaction
+4. List Transactions for User
+5. Set Budget
+6. Check Budget Status
+7. Generate Monthly Summary
+8. Generate Category Summary
+9. Exit
+Choose an option (1-9): Terminate batch job (Y/N)? 
