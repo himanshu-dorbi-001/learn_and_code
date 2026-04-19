@@ -1,0 +1,14 @@
+[2026-04-19T19:21:56.700Z] DataProcessor initialized
+[2026-04-19T19:21:56.700Z] Starting data processing
+[2026-04-19T19:21:56.700Z] Reading input file: C:\LandC session\UnitTest_Assignment\__tests__\temp\input.csv
+[2026-04-19T19:21:56.701Z] Read 3 lines
+[2026-04-19T19:21:56.701Z] Parsing data...
+[2026-04-19T19:21:56.701Z] Parsed 3 records
+[2026-04-19T19:21:56.701Z] Validating data...
+[2026-04-19T19:21:56.701Z] Validation complete. 2 valid records
+[2026-04-19T19:21:56.701Z] Transforming data...
+[2026-04-19T19:21:56.701Z] Transformation complete
+[2026-04-19T19:21:56.701Z] Calculating statistics...
+[2026-04-19T19:21:56.701Z] Statistics calculated: 4 metrics
+[2026-04-19T19:21:56.701Z] Writing output to: C:\LandC session\UnitTest_Assignment\__tests__\temp\output.csv
+[2026-04-19T19:21:56.702Z] Output written. 2 records processed
